@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model OCRText {
+  id        String   @id @default(cuid())
+  userId    String
+  imageUrl  String
+  markdown  String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("ocr_texts")
+}
+
+model UserSettings {
+  id             String   @id @default(cuid())
+  userId         String   @unique
+  apiProvider    String   @default("together")
+  apiKey         String?
+  model          String   @default("meta-llama/Llama-Vision-Free")
+  customEndpoint String?
+  useOwnKeys     Boolean  @default(false)
+  ocrPrompt      String   @db.Text @default("Extract all readable text from this image and format it as clean, well-structured Markdown. Preserve any formatting, headings, lists, or structure you can identify. If there are tables, format them as Markdown tables. Return only the extracted text in Markdown format.")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("user_settings")
+}
